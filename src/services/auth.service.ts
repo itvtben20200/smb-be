@@ -46,8 +46,8 @@ export class AuthService {
 
     const accessToken = jwt.sign(
       { userId: session.user.id, email: session.user.email, role: session.user.role },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
+      String(config.jwt.secret),
+      { expiresIn: '15m' }
     );
     return { accessToken };
   }
@@ -115,9 +115,11 @@ export class AuthService {
   }
 
   private async generateTokens(userId: string, email: string, role: string) {
-    const accessToken = jwt.sign({ userId, email, role }, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
-    });
+    const accessToken = jwt.sign(
+      { userId, email, role },
+      String(config.jwt.secret),
+      { expiresIn: '15m' }
+    );
     const refreshToken = crypto.randomBytes(40).toString('hex');
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 

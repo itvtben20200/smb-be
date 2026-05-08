@@ -39,7 +39,7 @@ export class OrderService {
       return { productId: item.productId, quantity: item.quantity, price: product.price };
     });
 
-    const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const subtotal = orderItems.reduce((sum, i) => sum + Number(i.price) * i.quantity, 0);
     const total = (session.amount_total || 0) / 100;
 
     const order = await prisma.order.create({
@@ -63,18 +63,18 @@ export class OrderService {
     const emailItems = order.items.map((i) => ({
       name: i.product.name,
       quantity: i.quantity,
-      price: i.price,
+      price: Number(i.price),
     }));
 
     Promise.all([
       emailService.sendOrderConfirmation(recipientEmail, {
         id: order.id,
-        total: order.total,
+        total: Number(order.total),
         items: emailItems,
       }),
       emailService.sendAdminNewOrder({
         id: order.id,
-        total: order.total,
+        total: Number(order.total),
         guestEmail: order.guestEmail,
         userName: order.user?.name,
       }),

@@ -123,8 +123,8 @@ export const autologin = async (req: Request, res: Response, next: NextFunction)
     // Issue real session tokens
     const accessToken = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
+      String(config.jwt.secret),
+      { expiresIn: '15m' }
     );
     const crypto = await import('crypto');
     const refreshToken = crypto.randomBytes(40).toString('hex');
