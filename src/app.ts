@@ -13,7 +13,14 @@ const app = express();
 
 // ── Security ───────────────────────────────────────────────────────────────
 app.use(helmet());
-app.use(cors({ origin: config.frontendUrl, credentials: true }));
+app.use(cors({ 
+  origin: [
+    config.frontendUrl, 
+    'http://localhost:3001',
+    'http://192.168.3.68:3001'
+  ], 
+  credentials: true 
+}));
 
 // ── Global rate limit ──────────────────────────────────────────────────────
 app.use(

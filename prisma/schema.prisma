@@ -43,6 +43,42 @@ enum CrmSyncStatus {
   FAILED
 }
 
+enum PortalContext {
+  MICROSOFT_STACK_PORTAL
+  SOVEREIGN_STACK_PORTAL
+}
+
+enum StackContext {
+  MICROSOFT
+  OPEN_SOVEREIGN
+}
+
+enum LeadStatus {
+  NEW
+  QUALIFIED
+  DEMO_BOOKED
+  OFFER_REQUESTED
+  CONVERTED
+  DISQUALIFIED
+  ARCHIVED
+}
+
+enum DemoType {
+  INTRO_DEMO
+  INDUSTRY_DEMO
+  TECHNICAL_DEMO
+  CONFIGURATION_DEMO
+  EXECUTIVE_DEMO
+}
+
+enum DemoBookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
 // ─── Models ──────────────────────────────────────────────────────────────────
 
 model User {
@@ -183,4 +219,58 @@ model CrmSyncLog {
 
   @@index([status])
   @@map("crm_sync_logs")
+}
+
+model Lead {
+  id              String        @id @default(uuid())
+  portalContext   PortalContext @map("portal_context")
+  stackContext    StackContext  @map("stack_context")
+  industryContext String?       @map("industry_context") @db.VarChar(100)
+  productContext  String?       @map("product_context") @db.VarChar(100)
+  companyName     String        @map("company_name") @db.VarChar(200)
+  companySize     String?       @map("company_size") @db.VarChar(50)
+  country         String?       @db.VarChar(100)
+  contactName     String        @map("contact_name") @db.VarChar(200)
+  email           String        @db.VarChar(255)
+  phone           String?       @db.VarChar(30)
+  message         String?
+  leadSource      String?       @map("lead_source") @db.VarChar(100)
+  utmSource       String?       @map("utm_source") @db.VarChar(200)
+  utmMedium       String?       @map("utm_medium") @db.VarChar(200)
+  utmCampaign     String?       @map("utm_campaign") @db.VarChar(200)
+  consentGiven    Boolean       @default(false) @map("consent_given")
+  leadStatus      LeadStatus    @default(NEW) @map("lead_status")
+  correlationId   String        @default(uuid()) @map("correlation_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  demoBookings DemoBooking[]
+
+  @@index([email])
+  @@index([portalContext, leadStatus])
+  @@index([correlationId])
+  @@map("leads")
+}
+
+model DemoBooking {
+  id                String            @id @default(uuid())
+  leadId            String?           @map("lead_id")
+  lead              Lead?             @relation(fields: [leadId], references: [id])
+  demoType          DemoType          @map("demo_type")
+  solutionInterest  String?           @map("solution_interest") @db.VarChar(200)
+  selectedSlot      DateTime?         @map("selected_slot")
+  timezone          String?           @db.VarChar(100)
+  preferredLanguage String?           @map("preferred_language") @db.VarChar(10)
+  portalContext     PortalContext      @map("portal_context")
+  stackContext      StackContext       @map("stack_context")
+  productContext    String?           @map("product_context") @db.VarChar(100)
+  status            DemoBookingStatus @default(PENDING)
+  correlationId     String            @default(uuid()) @map("correlation_id")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  @@index([leadId])
+  @@index([portalContext, status])
+  @@index([selectedSlot])
+  @@map("demo_bookings")
 }

@@ -8,8 +8,9 @@ const start = async () => {
   await connectRedis(); // non-fatal — server starts even if Redis is down
   startWorkers();
 
-  app.listen(config.port, () => {
+  app.listen(config.port, '0.0.0.0', () => {
     console.log(`[server] Running on port ${config.port} (${config.nodeEnv})`);
+    console.log(`[server] Network access: http://192.168.3.68:${config.port}`);
   });
 };
 
