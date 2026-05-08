@@ -13,12 +13,31 @@ const app = express();
 
 // ── Security ───────────────────────────────────────────────────────────────
 app.use(helmet());
+
+// Allow multiple origins (development, production, network)
+const allowedOrigins = [
+  config.frontendUrl,
+  'http://localhost:3001',
+  'http://localhost:3000',
+  'http://192.168.3.68:3001',
+];
+
+// Add additional origins from environment variable (comma-separated)
+if (process.env.ADDITIONAL_ORIGINS) {
+  allowedOrigins.push(...process.env.ADDITIONAL_ORIGINS.split(','));
+}
+
 app.use(cors({ 
-  origin: [
-    config.frontendUrl, 
-    'http://localhost:3001',
-    'http://192.168.3.68:3001'
-  ], 
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true 
 }));
 
