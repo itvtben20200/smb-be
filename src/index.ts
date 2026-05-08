@@ -8,9 +8,12 @@ const start = async () => {
   await connectRedis(); // non-fatal — server starts even if Redis is down
   startWorkers();
 
-  app.listen(config.port, '0.0.0.0', () => {
-    console.log(`[server] Running on port ${config.port} (${config.nodeEnv})`);
-    console.log(`[server] Network access: http://192.168.3.68:${config.port}`);
+  const port = process.env.PORT ? Number(process.env.PORT) : config.port;
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`[server] Running on port ${port} (${config.nodeEnv})`);
+    if (process.env.RAILWAY_STATIC_URL) {
+      console.log(`[server] Railway public URL: https://${process.env.RAILWAY_STATIC_URL}`);
+    }
   });
 };
 
