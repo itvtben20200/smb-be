@@ -46,6 +46,7 @@ async function main() {
       slug: 'smb-crm-suite',
       price: new Decimal('349.00'),
       stock: 999,
+      isActive: true,
       description: 'Enterprise-grade sales management platform built for modern teams. Manage your full pipeline from lead capture to close — with deal scoring, quota tracking, forecasting, and one-click CRM sync. Replaces spreadsheets with a unified sales command centre.',
       images: ['https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80'],
     },
@@ -54,6 +55,7 @@ async function main() {
       slug: 'analytics-pro',
       price: new Decimal('249.00'),
       stock: 999,
+      isActive: true,
       description: 'AI-powered sales co-pilot that writes follow-up emails, scores leads, summarises calls, and surfaces next-best-action recommendations in real time. Integrates with Outlook, Teams, Salesforce, and HubSpot out of the box.',
       images: ['https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80'],
     },
@@ -62,6 +64,7 @@ async function main() {
       slug: 'teamflow-project-manager',
       price: new Decimal('449.00'),
       stock: 999,
+      isActive: true,
       description: 'End-to-end revenue operations platform with real-time pipeline analytics, win/loss analysis, rep performance coaching, and multi-touch attribution. Turn your sales data into predictable revenue growth.',
       images: ['https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'],
     },
@@ -70,6 +73,7 @@ async function main() {
       slug: 'autobill-invoicing',
       price: new Decimal('199.00'),
       stock: 999,
+      isActive: true,
       description: 'Mobile-first solution for field sales reps and territory managers. GPS-based route optimisation, visit check-ins, offline mode, expense capture, and daily activity reports sent straight to your sales director.',
       images: ['https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&q=80'],
     },
@@ -78,6 +82,7 @@ async function main() {
       slug: 'hr-sync',
       price: new Decimal('299.00'),
       stock: 999,
+      isActive: true,
       description: 'Automate your entire sales ops workflow — lead routing, contract generation, e-signature, onboarding sequences, and renewal reminders. Cut manual admin by up to 70% so your team can focus on selling, not paperwork.',
       images: ['https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=600&q=80'],
     },
@@ -86,7 +91,7 @@ async function main() {
   for (const p of products) {
     await prisma.product.upsert({
       where: { slug: p.slug },
-      update: { name: p.name, price: p.price, description: p.description, images: p.images, stock: p.stock },
+      update: { name: p.name, price: p.price, description: p.description, images: p.images, stock: p.stock, isActive: p.isActive },
       create: p,
     });
     console.log(`[seed] Product: ${p.name} (€${p.price})`);
