@@ -20,6 +20,7 @@ const allowedOrigins = [
   'http://localhost:3001',
   'http://localhost:3000',
   'http://192.168.3.68:3001',
+  'https://smb-fe.vercel.app', // Explicit Vercel frontend
 ];
 
 // Add additional origins from environment variable (comma-separated)
@@ -32,13 +33,20 @@ app.use(cors({
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
+    // Check if origin is in allowed list or ends with .vercel.app
     if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.log('[CORS] Blocked origin:', origin);
+      callback(null, false); // Don't throw error, just reject
     }
   },
-  credentials: true 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Set-Cookie'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
 // ── Global rate limit ──────────────────────────────────────────────────────
