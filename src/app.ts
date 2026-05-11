@@ -60,6 +60,10 @@ app.use(
     max: 200,
     standardHeaders: true,
     legacyHeaders: false,
+    validate: {
+      trustProxy: false, // Disable trust proxy validation for Railway
+      xForwardedForHeader: false,
+    },
   })
 );
 
@@ -70,6 +74,10 @@ app.use(
     windowMs: 15 * 60 * 1000,
     max: 20,
     message: { error: 'Too many requests, please try again later.' },
+    validate: {
+      trustProxy: false,
+      xForwardedForHeader: false,
+    },
   })
 );
 
