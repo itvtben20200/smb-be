@@ -11,6 +11,9 @@ import router from './routes';
 
 const app = express();
 
+// ── Trust proxy (required for Railway, Heroku, etc.) ──────────────────────
+app.set('trust proxy', true);
+
 // ── Security ───────────────────────────────────────────────────────────────
 app.use(helmet());
 
