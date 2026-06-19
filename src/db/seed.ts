@@ -37,61 +37,132 @@ async function main() {
   });
 
   // ── Sample products ────────────────────────────────────────────────────────
-  // Uses upsert on existing slugs so FK constraints on order_items are not violated
+  // Deactivate old placeholder products so they don't appear in the store
+  await prisma.product.updateMany({
+    where: { slug: { in: ['smb-crm-suite', 'analytics-pro', 'teamflow-project-manager', 'autobill-invoicing', 'hr-sync'] } },
+    data: { isActive: false },
+  });
 
   // Note: price uses Decimal — never Float — to match DECIMAL(12,2) in DB
   const products = [
     {
-      name: 'Sales Hub Pro',
-      slug: 'smb-crm-suite',
+      name: 'QuickStart CE',
+      slug: 'quickstart-ce',
       price: new Decimal('349.00'),
       stock: 999,
       isActive: true,
-      description: 'Enterprise-grade sales management platform built for modern teams. Manage your full pipeline from lead capture to close — with deal scoring, quota tracking, forecasting, and one-click CRM sync. Replaces spreadsheets with a unified sales command centre.',
-      images: ['https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80'],
+      description:
+        'Mehr Umsatz durch smartes CRM – der schnellste Weg in eine digitale Vertriebsorganisation. ' +
+        'ITVT QuickStart CE basiert auf Microsoft Dynamics 365 Sales (Customer Engagement) und ist speziell für kleine und mittlere Unternehmen (10–250 Mitarbeitende) aus Handel, Dienstleistungen und Handwerk vorkonfiguriert. ' +
+        'Sie erhalten ein sofort einsatzbereites CRM-System für Lead-Management, strukturierte Angebotsprozesse und nachhaltige Kundenpflege – zu einem planbaren Fixpreis und mit garantierter Implementierungsdauer. ' +
+        'Dank vordefiniertem Funktionsumfang sind Sie in wenigen Tagen produktiv, ab nur einem User. ' +
+        'Ihr Vorteil: Minimaler Implementierungsaufwand, maximale Effizienz – starten Sie Ihre Digitalisierung und KI-Transformation schneller als je zuvor.',
+      features: [
+        'Microsoft Dynamics 365 Sales (CE) – vorkonfiguriert & sofort einsatzbereit',
+        'Lead-Management: Erfassung, Qualifizierung & automatisierte Zuweisung',
+        'Opportunity-Pipeline mit Gewinnwahrscheinlichkeit & Forecasting',
+        'Angebots- & Auftragserstellung direkt im CRM',
+        '360°-Kundensicht: Kontakte, Aktivitäten, Kommunikationshistorie',
+        'Automatisierte Follow-up-Aufgaben & E-Mail-Vorlagen',
+        'Nahtlose Integration mit Microsoft Outlook & Teams',
+        'Power BI-Dashboards für Vertriebsperformance & Pipeline-Analyse',
+        'Microsoft Copilot AI: Gesprächszusammenfassungen & Next-Best-Action',
+        'Mobiler Zugriff über iOS & Android App',
+        'Fixpreis-Implementierung – keine versteckten Kosten',
+        'Go-live in wenigen Tagen – skalierbar ab 1 User',
+      ],
+      images: ['https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=80'],
     },
     {
-      name: 'AI Sales Assistant',
-      slug: 'analytics-pro',
+      name: 'QuickStart BC',
+      slug: 'quickstart-bc',
       price: new Decimal('249.00'),
       stock: 999,
       isActive: true,
-      description: 'AI-powered sales co-pilot that writes follow-up emails, scores leads, summarises calls, and surfaces next-best-action recommendations in real time. Integrates with Outlook, Teams, Salesforce, and HubSpot out of the box.',
-      images: ['https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80'],
+      description:
+        'Effiziente Abläufe vom Einkauf bis zur Logistik – Ihr All-in-One ERP für den Mittelstand. ' +
+        'ITVT QuickStart BC basiert auf Microsoft Dynamics 365 Business Central und digitalisiert Ihre Kerngeschäftsprozesse in Einkauf, Verkauf, Lagerhaltung und Finanzbuchhaltung zu einem planbaren Festpreis. ' +
+        'Die Lösung ist speziell für Unternehmen mit 10–250 Mitarbeitenden aus Handel, Dienstleistungen, Fertigung und Handwerk vorkonfiguriert. ' +
+        'Flexibel erweiterbar um optionale Module wie Produktion, Serviceverwaltung oder Projektmanagement – exakt passend zu Ihrem Wachstum. ' +
+        'Ihr Vorteil: Minimaler Implementierungsaufwand, maximale Effizienz – starten Sie Ihre Digitalisierung und KI-Transformation schneller als je zuvor.',
+      features: [
+        'Microsoft Dynamics 365 Business Central – vorkonfiguriert für KMU',
+        'Finanzbuchhaltung: Hauptbuch, Debitoren, Kreditoren & Bank-Abgleich',
+        'Einkauf: Bestellanforderungen, Lieferantenbestellungen & Wareneingang',
+        'Verkauf: Angebote, Aufträge, Lieferscheine & Rechnungsstellung',
+        'Lagerverwaltung: Artikel, Lagerplätze, Inventur & Chargen-/Seriennummern',
+        'Echtzeit-Finanzreporting & anpassbare Power BI-Dashboards',
+        'Integration mit Microsoft 365: Outlook, Excel & Teams',
+        'Microsoft Copilot AI: Automatische Buchungsvorschläge & Anomalie-Erkennung',
+        'Optionales Modul: Produktion & Fertigungsaufträge',
+        'Optionales Modul: Serviceverwaltung & Wartungsverträge',
+        'Optionales Modul: Projektmanagement & Zeiterfassung',
+        'Fixpreis-Implementierung – planbar, kostensicher & schnell',
+      ],
+      images: ['https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80'],
     },
     {
-      name: 'Revenue Intelligence Suite',
-      slug: 'teamflow-project-manager',
+      name: 'QuickStart FSCM',
+      slug: 'quickstart-fscm',
       price: new Decimal('449.00'),
       stock: 999,
       isActive: true,
-      description: 'End-to-end revenue operations platform with real-time pipeline analytics, win/loss analysis, rep performance coaching, and multi-touch attribution. Turn your sales data into predictable revenue growth.',
-      images: ['https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'],
+      description:
+        'Enterprise-ERP für komplexe Finanz- und Lieferkettenprozesse im wachsenden Mittelstand. ' +
+        'ITVT QuickStart FSCM basiert auf Microsoft Dynamics 365 Finance & Supply Chain Management (F&SCM) – der leistungsstärksten ERP-Plattform von Microsoft für Unternehmen, die über die Möglichkeiten von Business Central hinauswachsen. ' +
+        'Die Lösung adressiert Unternehmen ab ca. 50 Mitarbeitenden mit komplexen Anforderungen an Finanzbuchhaltung, Beschaffung, Lager und Produktion. ' +
+        'Mehrere Buchungskreise, Fremdwährungsabwicklung, erweiterte Produktionsplanung und KI-gestützte Bedarfsprognosen sind standardmäßig enthalten. ' +
+        'Ihr Vorteil: Minimaler Implementierungsaufwand, maximale Effizienz – starten Sie Ihre Digitalisierung und KI-Transformation schneller als je zuvor.',
+      features: [
+        'Microsoft Dynamics 365 Finance & Supply Chain Management',
+        'Hauptbuch, Kostenrechnung, Budgetierung & Konsolidierung',
+        'Kreditorenbuchhaltung: Automatischer Rechnungsabgleich & Zahlungsläufe',
+        'Debitorenbuchhaltung: Mahnwesen, Forderungsmanagement & Inkasso',
+        'Beschaffung & Sourcing: Rahmenverträge, Lieferantenbewertung & Kataloge',
+        'Erweitertes Warehouse Management (WMS): Lagerplatz- & Wellensteuerung',
+        'Transportmanagement: Frachtplanung, Spediteurbuchung & Tracking',
+        'Produktionsplanung: MPS, MRP & Fertigungsauftragssteuerung',
+        'Multi-Buchungskreis & Mehrwährungsunterstützung (IFRS/HGB)',
+        'KI-gestützte Bedarfsprognosen & automatische Nachbestellvorschläge',
+        'Erweiterte Power BI-Analysen & Echtzeit-Controlling',
+        'Fixpreis-Implementierung mit garantierter Projektlaufzeit',
+      ],
+      images: ['https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80'],
     },
     {
-      name: 'Field Sales Manager',
-      slug: 'autobill-invoicing',
-      price: new Decimal('199.00'),
-      stock: 999,
-      isActive: true,
-      description: 'Mobile-first solution for field sales reps and territory managers. GPS-based route optimisation, visit check-ins, offline mode, expense capture, and daily activity reports sent straight to your sales director.',
-      images: ['https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&q=80'],
-    },
-    {
-      name: 'SalesOps Automation Platform',
-      slug: 'hr-sync',
+      name: 'QuickStart SW365',
+      slug: 'quickstart-sw365',
       price: new Decimal('299.00'),
       stock: 999,
       isActive: true,
-      description: 'Automate your entire sales ops workflow — lead routing, contract generation, e-signature, onboarding sequences, and renewal reminders. Cut manual admin by up to 70% so your team can focus on selling, not paperwork.',
-      images: ['https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=600&q=80'],
+      description:
+        'Kundenservice auf dem nächsten Level – die spezialisierte Digitallösung für Stadtwerke und Energieversorger. ' +
+        'ITVT QuickStart SW365 kombiniert Microsoft Dynamics 365 Customer Service mit der branchenspezifischen Stadtwerk 365-Lösung von ITVT Group – entwickelt aus über 20 Jahren Erfahrung in der Energiewirtschaft. ' +
+        'Sie erhalten strukturierte Kundenprozesse, intelligentes Fallmanagement, transparente Dashboards und die Einhaltung aller deutschen Regulierungsanforderungen – vorkonfiguriert, zu einem Festpreis und in kürzester Implementierungszeit. ' +
+        'Für EVUs, Stadtwerke und kommunale Versorger, die ihren Kundenservice professionalisieren und digitalisieren möchten. ' +
+        'Ihr Vorteil: Minimaler Implementierungsaufwand, maximale Effizienz – starten Sie Ihre Digitalisierung und KI-Transformation schneller als je zuvor.',
+      features: [
+        'Stadtwerk 365 – Branchenlösung auf Basis von Microsoft Dynamics 365',
+        'Intelligentes Fallmanagement: Erfassung, Kategorisierung & Priorisierung',
+        'Kundenkontakt-Center: Omnichannel (Telefon, E-Mail, Web, Portal)',
+        'Self-Service-Kundenportal: Zählerstand melden, Verträge verwalten',
+        'Zählerstand-Erfassung & Plausibilitätsprüfung',
+        'Abrechnungsintegration: Übergabe an SAP IS-U, Wilken & Co.',
+        'Vertragsmanagement: Tarifwechsel, Umzüge & Kündigungen',
+        'Transparente KPI-Dashboards: Servicelevel, Fallvolumen & Bearbeitungszeit',
+        'Compliance: Prozesse gemäß GasNZV, StromNZV & DSGVO',
+        'Microsoft Copilot AI: Automatische Fallantworten & Wissensartikel',
+        'Nahtlose Integration in Microsoft 365: Outlook & Teams',
+        'Fixpreis-Implementierung – speziell für EVUs & kommunale Versorger',
+      ],
+      images: ['https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80'],
     },
   ];
 
   for (const p of products) {
     await prisma.product.upsert({
       where: { slug: p.slug },
-      update: { name: p.name, price: p.price, description: p.description, images: p.images, stock: p.stock, isActive: p.isActive },
+      update: { name: p.name, price: p.price, description: p.description, features: p.features, images: p.images, stock: p.stock, isActive: p.isActive },
       create: p,
     });
     console.log(`[seed] Product: ${p.name} (€${p.price})`);
