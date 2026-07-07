@@ -27,6 +27,23 @@ export const getProduct = async (req: Request, res: Response, next: NextFunction
   try {
     const product = await prisma.product.findUnique({
       where: { slug: req.params.slug, isActive: true },
+      include: {
+        packages: {
+          where: { isActive: true },
+          orderBy: { sortOrder: 'asc' },
+          select: {
+            id: true,
+            name: true,
+            subtitle: true,
+            features: true,
+            implementationWeeks: true,
+            price: true,
+            badge: true,
+            recommended: true,
+            sortOrder: true,
+          },
+        },
+      },
     });
     if (!product) {
       res.status(404).json({ error: 'Product not found' });

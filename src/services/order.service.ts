@@ -16,7 +16,7 @@ export class OrderService {
     if (existing) return;
 
     const meta = session.metadata!;
-    const items: { productId: string; quantity: number }[] = JSON.parse(meta.items || '[]');
+    const items: { productId: string; packageId?: string; quantity: number }[] = JSON.parse(meta.items || '[]');
     const shippingAddress = JSON.parse(meta.shippingAddress || '{}');
     const userId = meta.userId || null;
     const guestEmail = meta.guestEmail || null;
@@ -31,12 +31,25 @@ export class OrderService {
     }
 
     // Fetch current product prices for order items
-    const productIds = items.map((i) => i.productId);
+    const productIds = [...new Set(items.map((i) => i.productId))];
     const products = await prisma.product.findMany({ where: { id: { in: productIds } } });
+
+    // Fetch packages for items that specify a packageId
+    const packageIds = items.map((i) => i.packageId).filter(Boolean) as string[];
+    const packages = packageIds.length
+      ? await prisma.productPackage.findMany({ where: { id: { in: packageIds } } })
+      : [];
 
     const orderItems = items.map((item) => {
       const product = products.find((p) => p.id === item.productId)!;
-      return { productId: item.productId, quantity: item.quantity, price: product.price };
+      const pkg = item.packageId ? packages.find((pk) => pk.id === item.packageId) : null;
+      return {
+        productId: item.productId,
+        packageId: pkg?.id ?? null,
+        packageName: pkg?.name ?? null,
+        quantity: item.quantity,
+        price: pkg ? pkg.price : product.price,
+      };
     });
 
     const subtotal = orderItems.reduce((sum, i) => sum + Number(i.price) * i.quantity, 0);

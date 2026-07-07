@@ -20,6 +20,7 @@ export interface ShippingAddress {
 
 export interface CartItem {
   productId: string;
+  packageId?: string;
   quantity: number;
 }
 
