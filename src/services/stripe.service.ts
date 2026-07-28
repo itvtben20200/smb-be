@@ -82,6 +82,7 @@ export class StripeService {
           images: item.images.slice(0, 1),
         },
         unit_amount: Math.round(item.price * 100),
+        recurring: { interval: 'month' },
       },
       quantity: item.quantity,
     }));
@@ -92,9 +93,16 @@ export class StripeService {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      mode: 'payment',
+      mode: 'subscription',
       line_items: lineItems,
       customer_email: customerEmail || undefined,
+      subscription_data: {
+        metadata: {
+          userId: userId || '',
+          guestEmail: guestEmail || '',
+          guestName: guestName || '',
+        },
+      },
       success_url: `${config.frontendUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${config.frontendUrl}/cart`,
       metadata: {

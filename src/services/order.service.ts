@@ -61,7 +61,8 @@ export class OrderService {
         guestEmail: userId ? null : guestEmail,
         guestName: userId ? null : guestName,
         stripeSessionId: session.id,
-        stripePaymentId: session.payment_intent as string,
+        stripePaymentId: (session.payment_intent as string | null) ?? null,
+        stripeSubscriptionId: (session.subscription as string | null) ?? null,
         status: 'PROCESSING',
         subtotal,
         total,
@@ -104,6 +105,58 @@ export class OrderService {
     if (email) {
       emailService.sendPaymentFailed(email).catch((err) =>
         console.error('[order] Payment failed email send error (non-fatal):', err)
+      );
+    }
+  }
+
+  async handleSubscriptionUpserted(subscription: Stripe.Subscription) {
+    const meta = subscription.metadata as Record<string, string> | null;
+    const userId = meta?.userId || null;
+    if (!userId) return;
+
+    const statusMap: Record<string, string> = {
+      trialing: 'TRIALING',
+      active: 'ACTIVE',
+      past_due: 'PAST_DUE',
+      canceled: 'CANCELLED',
+      incomplete: 'INCOMPLETE',
+      incomplete_expired: 'INCOMPLETE_EXPIRED',
+      unpaid: 'UNPAID',
+    };
+    const status = (statusMap[subscription.status] ?? 'INCOMPLETE') as any;
+
+    await prisma.subscription.upsert({
+      where: { stripeSubscriptionId: subscription.id },
+      update: {
+        status,
+        currentPeriodStart: new Date(subscription.current_period_start * 1000),
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      },
+      create: {
+        userId,
+        stripeSubscriptionId: subscription.id,
+        stripeCustomerId: subscription.customer as string,
+        status,
+        currentPeriodStart: new Date(subscription.current_period_start * 1000),
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      },
+    });
+  }
+
+  async handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+    await prisma.subscription.updateMany({
+      where: { stripeSubscriptionId: subscription.id },
+      data: { status: 'CANCELLED' as any, cancelAtPeriodEnd: false },
+    });
+  }
+
+  async handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
+    const email = invoice.customer_email;
+    if (email) {
+      emailService.sendPaymentFailed(email).catch((err) =>
+        console.error('[order] Invoice payment failed email error (non-fatal):', err)
       );
     }
   }

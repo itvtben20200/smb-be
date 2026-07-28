@@ -26,6 +26,22 @@ export const stripeWebhook = async (req: Request, res: Response): Promise<void> 
         await orderService.handleCheckoutCompleted(session);
         break;
       }
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription;
+        await orderService.handleSubscriptionUpserted(subscription);
+        break;
+      }
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription;
+        await orderService.handleSubscriptionDeleted(subscription);
+        break;
+      }
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        await orderService.handleInvoicePaymentFailed(invoice);
+        break;
+      }
       case 'payment_intent.payment_failed': {
         const intent = event.data.object as Stripe.PaymentIntent;
         await orderService.handlePaymentFailed(intent);
